@@ -1,4 +1,4 @@
-# HacktheU2020
+# 2020 Merch Hunters
 Github repo containing all of the entry contents for the HackTheU2020 Hackathon. 
 
  ### Authors:
