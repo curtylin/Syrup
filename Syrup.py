@@ -81,3 +81,6 @@ def createUser (first_name, last_name, email, password, agreements, DOB, idStrin
     #Save (commit) the changes
     conn.commit()
     return
+
+def calculateMonthlyTopThreeCategories(cardHolderID, accountID):
+    transactions = su.getCurrentMonthTransactions(cardHolderID, accountID)

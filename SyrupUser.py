@@ -1,19 +1,6 @@
-import asyncio
 import requests
 import json
-
-
-# class User:
-#     def __init__(self, id):
-#         # Spending dictionary where keys are categories and definition is the amount in that month.
-#         self.spending = {}
-#         # Total Spending is the current total for the current month.
-#         self.totalSpending = 0
-
-#         self.cardHolderID = id
-#         self.accounts = []
-        
-#         self.address = ()
+import datetime
 
 def createTransaction (self, transaction):
     url = "https://sandbox.galileo-ft.com/instant/v1/cardholders/9999/accounts/9887/transactions"
@@ -31,7 +18,9 @@ def createTransaction (self, transaction):
     print(response.text)
     return
 
-def getMonthlyTransactions(cardHolderID, accountID):
+def getCurrentMonthTransactions(cardHolderID, accountID):
+    currentMonth = datetime.date.month
+    currentYear = datetime.date.year
 
     url = "https://sandbox.galileo-ft.com/instant/v1/cardholders/" + cardHolderID + "/accounts/" + accountID +"/transactions"
 
@@ -39,7 +28,20 @@ def getMonthlyTransactions(cardHolderID, accountID):
 
     response = requests.request("GET", url, headers=headers)
 
-    print(response.text)
+    responseObj = response.json()
+
+    transactions = {}
+
+    for transaction in responseObj["transactions"]:
+        transactionMonth = transaction["timestamp"][5:7]
+        transactionYear = transaction["timestamp"][:5]
+        if transactionMonth == currentMonth and transactionYear == currentYear:
+            transactionID = transaction["transaction_id"]
+            transactionAmount = transaction["amount"]
+            transactionMerchant = transaction["description"]
+            transactions[transactionID] = (transactionAmount,transactionMerchant)
+    return transactions
+
 
 def createSpendingAccount(userID):
     url = "https://sandbox.galileo-ft.com/instant/v1/cardholders/" + str(userID) + "/accounts"
