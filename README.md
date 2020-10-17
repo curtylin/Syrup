@@ -1,7 +1,7 @@
 # Syrup
 Github repo containing all of the entry contents for the HackTheU2020 Hackathon. 
 
-## Syrup is the Mother of all Cards (MOAC) that helps users maximize the rewards from their existing credit cards. 
+## Syrup is a credit card that helps users maximize the rewards from their existing credit cards. This is achieved using Galileo's API to simulate credit cards and transactions. 
 
  ### Authors:
  Curtis Lin & Jonathan Fairbanks & Jeff Gay
