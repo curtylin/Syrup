@@ -1,11 +1,32 @@
 import SyrupUser as su
 import requests
+import sqlite3
+import json
+
+#Documentation to creating a db from sqlite : https://docs.python.org/3/library/sqlite3.html
+def setupDBs():
+    conn = sqlite3.connect('customers.db')
+    c = conn.cursor()
+
+    #Create table
+    c.execute('''CREATE TABLE customers
+                (cardHolderID, email, password)''')
+    #Save (commit) the changes
+    conn.commit()
+    #We can also close the connection if we are done with it.
+    #Just be sure any changes have been committed or they will be lost.
+    conn.close()
 
 
-## Spending dictionary where users are stored.
-users = []
+    conn = sqlite3.connect('merchants.db')
+    c = conn.cursor()
+    #Create table
+    c.execute('''CREATE TABLE merchants (merchant_name, category)''')
+    conn.commit()
+    conn.close()
 
-def createUser (first_name, last_name, email, agreements, DOB, idString, id_type,incomeAmount, incomeFrequency, incomeOccupation, incomeSource, mobileNumber, shippingAddress1, shippingAddress2='', shippingCity, shippingState, shippingZipcode, addrln1, addrln2='', city, state, zipcode, productID):
+
+def createUser (first_name, last_name, email, password, agreements, DOB, idString, id_type,incomeAmount, incomeFrequency, incomeOccupation, incomeSource, mobileNumber, shippingAddress1='', shippingAddress2='', shippingCity='', shippingState='', shippingZipcode='', addrln1='', addrln2='', city='', state='', zipcode='', productID=''):
 
     url = "https://sandbox.galileo-ft.com/instant/v1/cardholders"
     
@@ -53,11 +74,10 @@ def createUser (first_name, last_name, email, agreements, DOB, idString, id_type
 
     cardHolderID = int(responseObj['cardholder_id'])
 
-    user = su.User(cardHolderID)
-    users[cardHolderID] = user
+    conn = sqlite3.connect('customers.db')
+    c = conn.cursor()
+    #Insert user into the customers database
+    c.execute("INSERT INTO customers VALUES (%s,%s, %s, %s)" % (cardHolderID, email, password))
+    #Save (commit) the changes
+    conn.commit()
     return
-
-# At the start of each month, all of the transactions for each user is reset and cleared. 
-def NewMonth():
-    for user in users:
-        user.clearTransactions()
