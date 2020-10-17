@@ -20,12 +20,27 @@ def setupTest():
     responseObj = response.json()
     accessToken = responseObj['access_token']
     refreshToken = responseObj['refresh_token']
+    ms.seedMerchants()
     return
 
 
 setupTest()
-syrup.createUser("Curtis", "Lin", "clteslax@gmail.com", "123Password$%^", [1,2,3], "2000-03-04", 000000000, "ssn", "u150k", "weekly", "science_engineering", "employment", 0000000000, "1234E 100S", "", "Salt Lake City", "UT", "84102", "1234E 100S", "", "Salt Lake City", "UT", "84102", "1234")
-ms.seedMerchants()
+
+syrup.createUser("Curtis", "Lin", "clx@gmail.com", "123Password$%^", [1,2,3], "2000-03-04", 000000000, "ssn", "u150k", "weekly", "science_engineering", "employment", 0000000000, "1234E 100S", "", "Salt Lake City", "UT", "84102", "1234E 100S", "", "Salt Lake City", "UT", "84102", "1234")
+syrup.createUser("Bill", "Nye", "billnye@gmail.com", "123Password$%^", [1,2,3], "2000-03-04", 000000000, "ssn", "u150k", "weekly", "science_engineering", "employment", 0000000000, "1234E 100S", "", "Salt Lake City", "UT", "84102", "1234E 100S", "", "Salt Lake City", "UT", "84102", "1234")
+syrup.createUser("Jonathan", "Fairbanks", "jfk@gmail.com", "123Password$%^", [1,2,3], "2000-03-04", 000000000, "ssn", "u150k", "weekly", "science_engineering", "employment", 0000000000, "1234E 100S", "", "Salt Lake City", "UT", "84102", "1234E 100S", "", "Salt Lake City", "UT", "84102", "1234")
+syrup.createUser("Jeff", "Gay", "jgy@gmail.com", "123Password$%^", [1,2,3], "2000-03-04", 000000000, "ssn", "u150k", "weekly", "science_engineering", "employment", 0000000000, "1234E 100S", "", "Salt Lake City", "UT", "84102", "1234E 100S", "", "Salt Lake City", "UT", "84102", "1234")
+
+curtisCardHolderID = syrup.getCardHolderID("clx@gmail.com")
+curtisAccountID = su.createSpendingAccount(curtisCardHolderID)
+su.createTransaction(curtisCardHolderID, curtisAccountID, 20, "Chipotle")
+su.createTransaction(curtisCardHolderID, curtisAccountID, 30, "Smiths")
+su.createTransaction(curtisCardHolderID, curtisAccountID, 222, "Delta")
+su.createTransaction(curtisCardHolderID, curtisAccountID, 1200.58, "Apple_Inc")
+su.createTransaction(curtisCardHolderID, curtisAccountID, 20, "Chipotle")
+
+print(su.calculateMonthlyTopThreeCategories())
+
 
 
 

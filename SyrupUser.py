@@ -1,12 +1,13 @@
 import requests
 import json
 import datetime
+import sqlite3
 
-def createTransaction (self, transaction):
-    url = "https://sandbox.galileo-ft.com/instant/v1/cardholders/9999/accounts/9887/transactions"
+def createTransaction (cardHolderID, accountID, amount, merchantName):
+    url = "https://sandbox.galileo-ft.com/instant/v1/cardholders/"+ cardHolderID + "/accounts/" + accountID + "/transactions"
     payload = {
-        "amount": 10,
-        "merchant_name": "Chipotle"
+        "amount": amount,
+        "merchant_name": merchantName
     }
     headers = {
         "accept": "*/*",
@@ -43,8 +44,8 @@ def getCurrentMonthTransactions(cardHolderID, accountID):
     return transactions
 
 
-def createSpendingAccount(userID):
-    url = "https://sandbox.galileo-ft.com/instant/v1/cardholders/" + str(userID) + "/accounts"
+def createSpendingAccount(cardHolderID):
+    url = "https://sandbox.galileo-ft.com/instant/v1/cardholders/" + str(cardHolderID) + "/accounts"
     payload = {
         "account": {"processor_token": "99999"},
         "account_type": "spending_account"
@@ -57,20 +58,20 @@ def createSpendingAccount(userID):
     if response.status_code != 201:
         raise Exception(response)
     
-    return
+    return response.json()["account_id"]
 
-def listAccounts(userID):
-    url = "https://sandbox.galileo-ft.com/instant/v1/cardholders/" + userID + "/accounts"
+def listAccounts(cardHolderID):
+    url = "https://sandbox.galileo-ft.com/instant/v1/cardholders/" + cardHolderID + "/accounts"
     headers = {"accept": "*/*"}
     response = requests.request("GET", url, headers=headers)
     print(response.text)
-    return
+    return 
 
 
-def retrieveAccount(userID, accountID=-1):
+def retrieveAccount(cardHolderID, accountID=-1):
     url = ''
     if accountID != -1:
-        url = "https://sandbox.galileo-ft.com/instant/v1/cardholders/" + userID + "/accounts/" + accountID
+        url = "https://sandbox.galileo-ft.com/instant/v1/cardholders/" + cardHolderID + "/accounts/" + accountID
     else:
         raise Exception("Account ID cannot be -1!")
     headers = {"accept": "*/*"}
@@ -78,4 +79,7 @@ def retrieveAccount(userID, accountID=-1):
     print(response.text)
     return
     
-
+def getCardHolderID(email):
+    conn = sqlite3.connect('customers.db')
+    c = conn.cursor()
+    return c.execute("SELECT cardHolderID FROM customers WHERE email=%s" % email)

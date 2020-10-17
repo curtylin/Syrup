@@ -77,10 +77,21 @@ def createUser (first_name, last_name, email, password, agreements, DOB, idStrin
     conn = sqlite3.connect('customers.db')
     c = conn.cursor()
     #Insert user into the customers database
-    c.execute("INSERT INTO customers VALUES (%s,%s, %s, %s)" % (cardHolderID, email, password))
+    c.execute("INSERT INTO customers VALUES (%s,%s, %s)" % (cardHolderID, email, password))
     #Save (commit) the changes
     conn.commit()
     return
 
 def calculateMonthlyTopThreeCategories(cardHolderID, accountID):
+    spending = {}
+    conn = sqlite3.connect('merchants.db')
+    c = conn.cursor()
+    
     transactions = su.getCurrentMonthTransactions(cardHolderID, accountID)
+    for transaction in transactions:
+        category = c.execute("SELECT category FROM merchants WHERE merchant_name=%s" % transaction[1])
+        spending[category] += transaction[0]
+    
+    #https://stackoverflow.com/questions/40496518/how-to-get-the-3-items-with-the-highest-value-from-dictionary
+    topCategories = sorted(spending, key=spending.get, reverse=True)[:3]
+    conn.close()

@@ -4,6 +4,7 @@ def seedMerchants():
     conn = sqlite3.connect('merchants.db')
     c = conn.cursor()
     #Create table
+    c.execute("DELETE FROM merchants")
     c.execute("INSERT INTO merchants VALUES (Chipotle, Dining)")
     c.execute("INSERT INTO merchants VALUES (Smiths, Grocery)")
     c.execute("INSERT INTO merchants VALUES (Dell, Shopping)")
