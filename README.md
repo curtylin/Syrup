@@ -12,4 +12,6 @@ Github repo containing all of the entry contents for the HackTheU2020 Hackathon.
  # Author Notes: 
  N/A
  
+ Merchant/Category Seeding document can be found [here](https://docs.google.com/spreadsheets/d/1gW1QjePQRcohID5-e6J17nQgWetQ0qVZ7VY2_lIN2YQ/edit?usp=sharing)
+ 
  ---
