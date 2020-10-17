@@ -7,6 +7,7 @@ import json
 def setupDBs():
     conn = sqlite3.connect('customers.db')
     c = conn.cursor()
+    c.execute("DROP TABLE customers")
 
     #Create table
     c.execute('''CREATE TABLE customers
@@ -20,6 +21,7 @@ def setupDBs():
 
     conn = sqlite3.connect('merchants.db')
     c = conn.cursor()
+    c.execute("DROP TABLE merchants")
     #Create table
     c.execute('''CREATE TABLE merchants (merchant_name, category)''')
     conn.commit()
@@ -66,7 +68,7 @@ def createUser (first_name, last_name, email, password, agreements, DOB, idStrin
         "content-type": "application/json"
     }
 
-    response = requests.request("POST", url, headers=headers)
+    response = requests.request("POST", url, json=payload, headers=headers)
 
     if response.status_code != 201:
         raise Exception(response)

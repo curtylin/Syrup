@@ -7,19 +7,20 @@ import json
 ## Testing script for all of the API and transactions. 
 
 # Api URL: https://sandbox.galileo-ft.com/instant/v1/
-GalileoAPIUsername = ''
-GalileoAPIPassword = ''
+GalileoAPIUsername = 'CgZ1b6oVWOGP'
+GalileoAPIPassword = '2nN3YeCt52DGe9wf0Xa2'
 accessToken = ''        #Access token used throughout the API requests
 refreshToken = ''       #Refresh token used to refresh access to the API
 
 
 def setupTest():
     response = requests.post('https://sandbox.galileo-ft.com/instant/v1/login?username=' + GalileoAPIUsername + '&password=' + GalileoAPIPassword)
-    if response.status_code != 200:
-        raise Exception(response)
+    # if response.status_code != 201 or response.status_code != 200:
+    #     raise Exception(response)
     responseObj = response.json()
     accessToken = responseObj['access_token']
     refreshToken = responseObj['refresh_token']
+    syrup.setupDBs()
     ms.seedMerchants()
     return
 
