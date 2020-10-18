@@ -7,8 +7,8 @@ import json
 ## Testing script for all of the API and transactions. 
 
 # Api URL: https://sandbox.galileo-ft.com/instant/v1/
-GalileoAPIUsername = 'CgZ1b6oVWOGP'
-GalileoAPIPassword = '2nN3YeCt52DGe9wf0Xa2'
+GalileoAPIUsername = ''
+GalileoAPIPassword = ''
 accessToken = ''        #Access token used throughout the API requests
 refreshToken = ''       #Refresh token used to refresh access to the API
 
