@@ -17,7 +17,7 @@ def checkIfOverLimit(cardHolderID, accountID, cardID):
 
 def hitLimit(accessToken,cardHolderID, accountID, cardID):
 
-    url = "https://sandbox.galileo-ft.com/instant/v1/cardholders/"+ cardHolderID +"/accounts/"+accountID + "/cards/"+ cardID
+    url = "https://sandbox.galileo-ft.com/instant/v1/cardholders/"+ str(cardHolderID) +"/accounts/"+ string(accountID) + "/cards/"+ string(cardID)
 
     payload = {"status": "frozen"}
     headers = {

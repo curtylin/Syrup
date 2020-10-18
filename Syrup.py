@@ -1,5 +1,5 @@
 import SyrupUser as su
-import overLimitProtection as olp
+# import overLimitProtection as olp
 import requests
 import sqlite3
 import json
@@ -56,18 +56,23 @@ def getCardholderAgreements(productID):
     businessID = 59115
 
     url = "https://sandbox.galileo-ft.com/instant/v1/businesses/"+ str(businessID) +"/products/"+str(productID)+"/agreements"
-
-    headers = {
+    global _accessToken
+    
+    try:
+        headers = {
         "accept": "*/*",
         "Authorization": "Bearer " + _accessToken
-    }
-    try:
+        }
         response = requests.request("GET", url, headers=headers)
         responseObj = response.json()
         for agreement in responseObj['agreements']:
             agreements.append(agreement["agreement_id"])
     except:
         refreshAuthorization()
+        headers = {
+        "accept": "*/*",
+        "Authorization": "Bearer " + _accessToken
+        }
         response = requests.request("GET", url, headers=headers)
         responseObj = response.json()
         for agreement in responseObj['agreements']:
@@ -79,7 +84,6 @@ def createUser (first_name, last_name, email, password, DOB, idString, id_type,i
 
     agreements = []
     agreements = getCardholderAgreements(productID)
-
 
     url = "https://sandbox.galileo-ft.com/instant/v1/cardholders"
     
@@ -118,14 +122,21 @@ def createUser (first_name, last_name, email, password, DOB, idString, id_type,i
     },
     "product_id": productID
 }
-    headers = {
-        "accept": "*/*",
-        "content-type": "application/json",
-        "Authorization": "Bearer " + _accessToken,
-    }
-    print("payload")
-    print(payload)
-    response = requests.request("POST", url, json=payload, headers=headers)
+    try:
+        headers = {
+            "accept": "*/*",
+            "content-type": "application/json",
+            "Authorization": "Bearer " + _accessToken,
+        }
+        response = requests.request("POST", url, json=payload, headers=headers)
+    except:
+        refreshAuthorization()
+        headers = {
+            "accept": "*/*",
+            "content-type": "application/json",
+            "Authorization": "Bearer " + _accessToken,
+        }
+        response = requests.request("POST", url, json=payload, headers=headers)
 
     if response.status_code != 201:
         raise Exception(response,response.json())
@@ -141,12 +152,12 @@ def createUser (first_name, last_name, email, password, DOB, idString, id_type,i
     conn.commit()
     return
 
-def calculateMonthlyTopThreeCategories(accessToken, cardHolderID, accountID):
+def calculateMonthlyCategories(cardHolderID, accountID):
     spending = {}
     conn = sqlite3.connect('merchants.db')
     c = conn.cursor()
    
-    transactions = su.getCurrentMonthTransactions(accessToken, cardHolderID, accountID)
+    transactions = su.getCurrentMonthTransactions(cardHolderID, accountID)
     for transaction in transactions:
         merchantName = transactions[transaction][1]
         result = c.execute("SELECT category FROM merchants WHERE merchant_name=\"" + merchantName +"\"")
@@ -155,9 +166,11 @@ def calculateMonthlyTopThreeCategories(accessToken, cardHolderID, accountID):
             spending[category] = abs(transactions[transaction][0])
         spending[category] += abs(transactions[transaction][0]) 
     
-    #https://stackoverflow.com/questions/40496518/how-to-get-the-3-items-with-the-highest-value-from-dictionary
-    topCategories = sorted(spending, key=spending.get, reverse=True)[:3]
     conn.close()
-    return topCategories
+    return spending
 
-#def deleteALLUsers():
+def getTopThreeCategories(cardHolderID, accountID):
+    categories = calculateMonthlyCategories(cardHolderID, accountID)
+    #https://stackoverflow.com/questions/40496518/how-to-get-the-3-items-with-the-highest-value-from-dictionary
+    return sorted(categories, key=categories.get, reverse=True)[:3]
+

@@ -4,7 +4,6 @@ import datetime
 import sqlite3
 import Syrup as syrup
 
-_accessToken = ''        #Access token used throughout the API requests
 
 def createTransaction (cardHolderID, accountID, amount, merchantName):
     url = "https://sandbox.galileo-ft.com/instant/v1/cardholders/"+ str(cardHolderID) + "/accounts/" + str(accountID) + "/transactions"
@@ -12,27 +11,44 @@ def createTransaction (cardHolderID, accountID, amount, merchantName):
         "amount": int(amount),
         "merchant_name": merchantName
     }
-    headers = {
-        "accept": "*/*",
-        "Authorization": "Bearer " + _accessToken,
-        "content-type": "application/json"
-    }
-    
-    response = requests.request("POST", url, json=payload, headers=headers)
-    
+    try:
+        headers = {
+            "accept": "*/*",
+            "Authorization": "Bearer " + syrup._accessToken,
+            "content-type": "application/json"
+        }
+        response = requests.request("POST", url, json=payload, headers=headers)
+    except:
+        _accessToken = syrup.refreshAuthorization()
+        headers = {
+            "accept": "*/*",
+            "Authorization": "Bearer " + syrup._accessToken,
+            "content-type": "application/json"
+        }
+        response = requests.request("POST", url, json=payload, headers=headers)
+
     print(response.text)
     return
 
-def getCurrentMonthTransactions(accessToken, cardHolderID, accountID):
+def getCurrentMonthTransactions(cardHolderID, accountID):
     dateToday = str(datetime.date.today())
     currentMonth = int(dateToday[5:7])
     currentYear = int(dateToday[:4])
     url = "https://sandbox.galileo-ft.com/instant/v1/cardholders/" + str(cardHolderID) + "/accounts/" + str(accountID) +"/transactions"
 
-    headers = {
-        "accept": "*/*",
-        "Authorization": "Bearer " + accessToken
-    }
+    try:
+        headers = {
+            "accept": "*/*",
+            "Authorization": "Bearer " + syrup._accessToken
+        }
+        response = requests.request("GET", url, headers=headers)
+    except:
+        _accessToken = syrup.refreshAuthorization()
+        headers = {
+            "accept": "*/*",
+            "Authorization": "Bearer " + syrup._accessToken
+        }
+        response = requests.request("GET", url, headers=headers)
 
     response = requests.request("GET", url, headers=headers)
 
@@ -58,25 +74,33 @@ def createSpendingAccount(accessToken, cardHolderID):
         "account": {"processor_token": "99999"},
         "account_type": "spending_account"
     }
-    headers = {
-        "accept": "*/*",
-        "Authorization": "Bearer " + accessToken,
-        "content-type": "application/json"
-    }
-    response = requests.request("POST", url, json=payload, headers=headers)
+    try:
+        headers = {
+            "accept": "*/*",
+            "Authorization": "Bearer " + syrup._accessToken,
+            "content-type": "application/json"
+        }
+        response = requests.request("POST", url, json=payload, headers=headers)
+    except:
+        _accessToken = syrup.refreshAuthorization()
+        headers = {
+            "accept": "*/*",
+            "Authorization": "Bearer " + syrup._accessToken,
+            "content-type": "application/json"
+        }
+        response = requests.request("POST", url, json=payload, headers=headers)
     if response.status_code != 201:
         raise Exception(response)
     
     return response.json()["account_id"]
 
 def listAccounts(accessToken, cardHolderID):
-    global _accessToken
     url = "https://sandbox.galileo-ft.com/instant/v1/cardholders/" + str(cardHolderID) + "/accounts"
     response = {}
     try:
         headers = {
             "accept": "*/*",
-            "Authorization": "Bearer " + _accessToken
+            "Authorization": "Bearer " + syrup._accessToken
         }
         response = requests.request("GET", url, headers=headers)
     except:
@@ -102,29 +126,48 @@ def fundAccount(destinationAccountID, sourceAccountID, amount):
         "destination_account_id": destinationAccountID,
         "source_account_id": sourceAccountID
     }
-    headers = {
-        "accept": "*/*",
-        "content-type": "application/json",
-        "Authorization": "Bearer " + syrup._accessToken
-    }
 
-    response = requests.request("POST", url, json=payload, headers=headers)
+    try:
+        headers = {
+            "accept": "*/*",
+            "content-type": "application/json",
+            "Authorization": "Bearer " + syrup._accessToken
+        }
+        response = requests.request("POST", url, json=payload, headers=headers)
+    except:
+        _accessToken = syrup.refreshAuthorization()
+        headers = {
+            "accept": "*/*",
+            "content-type": "application/json",
+            "Authorization": "Bearer " + syrup._accessToken
+        }
+        response = requests.request("POST", url, json=payload, headers=headers)
+
     if response.status_code != 201:
         print(response.json())
         raise Exception(response)
     return
 
-def retrieveAccount(accessToken, cardHolderID, accountID=-1):
+def retrieveAccount(cardHolderID, accountID=-1):
     url = ''
     if accountID != -1:
         url = "https://sandbox.galileo-ft.com/instant/v1/cardholders/" + cardHolderID + "/accounts/" + accountID
     else:
         raise Exception("Account ID cannot be -1!")
-    headers = {
-        "accept": "*/*",
-        "Authorization": "Bearer " + accessToken
-    }
-    response = requests.request("GET", url, headers=headers)
+    try:
+        headers = {
+            "accept": "*/*",
+            "Authorization": "Bearer " + syrup._accessToken
+        }
+        response = requests.request("GET", url, headers=headers)
+    except:
+        syrup.refreshAuthorization()
+        headers = {
+            "accept": "*/*",
+            "Authorization": "Bearer " + syrup._accessToken
+        }
+        response = requests.request("GET", url, headers=headers)
+
     print(response.text)
     return
     
@@ -132,8 +175,3 @@ def getCardHolderID(email):
     conn = sqlite3.connect('customers.db')
     c = conn.cursor()
     return c.execute("SELECT cardHolderID FROM customers WHERE email=%s" % email)
-
-def setTokens(accessToken, refreshAuthorizationToken):
-    global _accessToken, _refreshToken
-    _accessToken = accessToken
-    _refreshToken = refreshAuthorizationToken
