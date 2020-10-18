@@ -8,6 +8,7 @@ def seedMerchants():
     c.execute("INSERT INTO merchants VALUES ('Smiths', 'Grocery')")
     c.execute("INSERT INTO merchants VALUES ('Dell', 'Shopping')")
     c.execute("INSERT INTO merchants VALUES ('Delta Airlines', 'Travel')")
+    c.execute("INSERT INTO merchants VALUES ('Delta', 'Travel')")
     c.execute("INSERT INTO merchants VALUES ('Burger_King', 'Dining')")
     c.execute("INSERT INTO merchants VALUES ('McDonalds', 'Dining')")
     c.execute("INSERT INTO merchants VALUES ('Hydroflask', 'Shopping')")
