@@ -2,6 +2,7 @@ import Syrup as syrup
 import SyrupUser as su
 import MerchantsSeeding as ms
 import BonusCashBack as bcb
+import OverLimitProtection as olp
 import requests
 import json
 
@@ -24,7 +25,6 @@ def setupTest():
     refreshToken = responseObj['refresh_token']
     syrup.setTokens(accessToken=accessToken, refreshAuthorizationToken=refreshToken)
     syrup.setupDBs()
-    ms.seedMerchants()
     return
 
 def createUsers():
@@ -43,7 +43,7 @@ def fundAndCreateTransactions():
 
 
 
-setupTest()
+# setupTest()
 # createUsers()
 # fundAndCreateTransactions()
 
@@ -56,5 +56,7 @@ test_AccountID = su.listAccounts(accessToken, test_CardHolderID)[0]
 # calculatedMonthlyCategories = syrup.calculateMonthlyCategories(test_CardHolderID, test_AccountID)
 # topThreeCategories = syrup.getTopThreeCategories(calculatedMonthlyCategories)
 
-print(bcb.getIgnoredMerchants(test_CardHolderID, test_AccountID))
+# print(bcb.getIgnoredMerchants(test_CardHolderID, test_AccountID))
+
+olp.checkIfOverLimit(test_CardHolderID, test_AccountID, 99999)
 

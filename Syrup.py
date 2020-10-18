@@ -1,4 +1,6 @@
 import SyrupUser as su
+import MerchantsSeeding as ms
+import customerSeeding as cs
 # import overLimitProtection as olp
 import requests
 import sqlite3
@@ -10,18 +12,18 @@ _refreshToken = ''       #Refresh token used to refresh access to the API
 
 #Documentation to creating a db from sqlite : https://docs.python.org/3/library/sqlite3.html
 def setupDBs():
-    # conn = sqlite3.connect('customers.db')
-    # c = conn.cursor()
-    # c.execute("DROP TABLE customers")
+    conn = sqlite3.connect('customers.db')
+    c = conn.cursor()
+    c.execute("DROP TABLE customers")
 
-    # #Create table
-    # c.execute('''CREATE TABLE customers 
-    #             ( cardHolderID integer NOT NULL AUTO_INCREMENT PRIMARY KEY, email text NOT NULL, password text NOT NULL);''' )
-    # #Save (commit) the changes
-    # conn.commit()
-    # #We can also close the connection if we are done with it.
-    # #Just be sure any changes have been committed or they will be lost.
-    # conn.close()
+    #Create table
+    c.execute('''CREATE TABLE customers 
+                ( cardHolderID, userEmail, overLimitProtectionThreshold);''' )
+    #Save (commit) the changes
+    conn.commit()
+    #We can also close the connection if we are done with it.
+    #Just be sure any changes have been committed or they will be lost.
+    conn.close()
 
 
     conn = sqlite3.connect('merchants.db')
@@ -31,6 +33,8 @@ def setupDBs():
     c.execute('''CREATE TABLE merchants (merchant_name, category)''')
     conn.commit()
     conn.close()
+    ms.seedMerchants()
+    cs.seedUsers()
 
 def setTokens(accessToken, refreshAuthorizationToken):
     global _accessToken, _refreshToken
@@ -147,7 +151,7 @@ def createUser (first_name, last_name, email, password, DOB, idString, id_type,i
     conn = sqlite3.connect('customers.db')
     c = conn.cursor()
     #Insert user into the customers database
-    c.execute("INSERT INTO customers VALUES (%s,%s, %s)", (cardHolderID,email, password))
+    c.execute("INSERT INTO customers VALUES (%s , %s , %i)" % cardHolderID, email, 100)
     #Save (commit) the changes
     conn.commit()
     return

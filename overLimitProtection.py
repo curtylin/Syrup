@@ -10,9 +10,10 @@ def checkIfOverLimit(cardHolderID, accountID, cardID):
     conn = sqlite3.connect('customers.db')
     c = conn.cursor()
     #Insert user into the customers database
-    c.execute("SELECT FROM customers VALUES (%s,%s, %s)" % (cardHolderID, email, password))
-    #Save (commit) the changes
-    conn.commit()
+    result = c.execute("SELECT overLimitProtectionThreshold FROM merchants WHERE cardHolderID=\"" + cardHolderID +"\"")
+    protectionThreshold = c.fetchall()[0]
+    print(protectionThreshold)
+    conn.close()
     return 
 
 def hitLimit(accessToken,cardHolderID, accountID, cardID):

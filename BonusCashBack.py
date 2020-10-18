@@ -39,7 +39,7 @@ def getIgnoredMerchants(cardHolderID, accountID):
     for ignoredCategory in ignoredCategories:
         c.execute("SELECT merchant_name FROM merchants WHERE category=\"" + ignoredCategory + "\"")
         merchants.append(c.fetchall()[0][0])
-
+    conn.close()
     return merchants
 
 
